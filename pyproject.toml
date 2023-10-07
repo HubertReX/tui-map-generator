@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "tui-map-generator"
+version = "0.1.0"
+description = "Height map generator using diamond square with TUI interface"
+authors = ["Hubert Nafalski <hubert.nafalski@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+rich = "^13.6.0"
+trogon = "^0.5.0"
+rich-pixels = "^2.1.1"
+pyrexpaint = "^0.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
