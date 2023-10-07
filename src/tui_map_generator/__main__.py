@@ -8,6 +8,7 @@ from typing import cast
 import struct
 from rich.segment import Segment, Segments
 from rich.style import Style
+
 # from rich.panel import Panel
 from rich_pixels import Pixels
 from rich.console import Console
@@ -15,6 +16,7 @@ import pyrexpaint
 from pathlib import Path
 import click
 from trogon import tui
+
 # Example usage:
 HEIGHT_NIL: int = 0
 HEIGHT_MIN: int = 1
@@ -28,7 +30,7 @@ COLOR_PALETTE = "landscape_16"
 
 PRINT_FORMAT_LEN: int = 3
 JSON_INDENT: int = 4
-FIRST_MAP_CHAR: str = 'A'
+FIRST_MAP_CHAR: str = "A"
 MAPS_FOLDER: str = "maps"
 MAP_NAME: str = "height_map"
 
@@ -54,7 +56,7 @@ def build_default_palettes():
             "D": {"fg": (255, 255, 255), "bg": (000, 191, 000)},
             "E": {"fg": (255, 255, 255), "bg": (000, 63, 000)},
             "F": {"fg": (255, 255, 255), "bg": (138, 117, 88)},
-            "G": {"fg": (000, 000, 000), "bg": (85,   85,  85)},
+            "G": {"fg": (000, 000, 000), "bg": (85, 85, 85)},
             "H": {"fg": (000, 000, 000), "bg": (255, 255, 255)},
         },
         "landscape_16": {
@@ -70,7 +72,7 @@ def build_default_palettes():
             "J": {"fg": (255, 255, 255), "bg": (100, 85, 64)},
             "K": {"fg": (255, 255, 255), "bg": (119, 101, 76)},
             "L": {"fg": (255, 255, 255), "bg": (138, 117, 88)},
-            "M": {"fg": (000, 000, 000), "bg": (85,   85,  85)},
+            "M": {"fg": (000, 000, 000), "bg": (85, 85, 85)},
             "N": {"fg": (000, 000, 000), "bg": (135, 135, 135)},
             "O": {"fg": (000, 000, 000), "bg": (150, 150, 150)},
             "P": {"fg": (000, 000, 000), "bg": (255, 255, 255)},
@@ -105,7 +107,7 @@ def build_default_palette(no_shades: int, colors: list[int]) -> dict[str, dict]:
     for x in range(no_shades):
         p[chr(ord(FIRST_MAP_CHAR) + x)] = {
             "fg": (255, 255, 255),
-            "bg": (x*step*colors[0], x*step*colors[1], x*step*colors[2])
+            "bg": (x * step * colors[0], x * step * colors[1], x * step * colors[2]),
         }
     return p
 
@@ -115,7 +117,6 @@ build_default_palettes()
 
 
 class DiamondSquare:
-
     def __init__(
         self,
         map_size: int,
@@ -126,7 +127,6 @@ class DiamondSquare:
         height_nil: int = HEIGHT_NIL,
         map_name: str = MAP_NAME,
         palette: str = COLOR_PALETTE,
-
     ):
         self.map_size = map_size
         self.height_min = height_min
@@ -146,17 +146,18 @@ class DiamondSquare:
         else:
             self.palette = COLOR_PALETTE
 
-        # self.palette = self.palette16_dict["landscape_16"]
-
         self.build_palette()
 
     def build_palette(self):
         self.palette_dict = PALETTES_DICT[self.palette]
         self.mapping = {}
         for symbol in self.palette_dict:
-            fg_r, fg_g, fg_b = self.palette_dict[symbol]['fg']
-            bg_r, bg_g, bg_b = self.palette_dict[symbol]['bg']
-            self.mapping[symbol] = Segment("  ", Style.parse(f"rgb({fg_r},{fg_g},{fg_b}) on rgb({bg_r},{bg_g},{bg_b})"))
+            fg_r, fg_g, fg_b = self.palette_dict[symbol]["fg"]
+            bg_r, bg_g, bg_b = self.palette_dict[symbol]["bg"]
+            self.mapping[symbol] = Segment(
+                "  ",
+                Style.parse(f"rgb({fg_r},{fg_g},{fg_b}) on rgb({bg_r},{bg_g},{bg_b})"),
+            )
         return self.mapping
 
     def init_height_map(self) -> THeightMap:
@@ -169,7 +170,11 @@ class DiamondSquare:
         return height_map
 
     def round_and_clamp(self, value: float) -> int:
-        result = math.floor(value) if abs(math.ceil(value) - value) > abs(value - math.floor(value)) else math.ceil(value)
+        result = (
+            math.floor(value)
+            if abs(math.ceil(value) - value) > abs(value - math.floor(value))
+            else math.ceil(value)
+        )
 
         if result < self.height_min:
             return self.height_min
@@ -206,17 +211,23 @@ class DiamondSquare:
                     sum_of_neighbors += self.height_map[y + chunk_size][x]
                     sum_of_neighbors += self.height_map[y + chunk_size][x + chunk_size]
 
-                    # self.height_map[y + chunk_size_half][x + chunk_size_half] = self.round(
-                    #     (sum_of_neighbors / 4) + self.random_value(random_scalar))
-                    self.height_map[y + chunk_size_half][x + chunk_size_half] = self.round_and_clamp(
-                        (self.height_map[y][x] + self.height_map[y][x + chunk_size] + self.height_map[y + chunk_size]
-                         [x] + self.height_map[y + chunk_size][x + chunk_size]) / 4 + self.random_value(random_scalar)
+                    self.height_map[y + chunk_size_half][
+                        x + chunk_size_half
+                    ] = self.round_and_clamp(
+                        (
+                            self.height_map[y][x]
+                            + self.height_map[y][x + chunk_size]
+                            + self.height_map[y + chunk_size][x]
+                            + self.height_map[y + chunk_size][x + chunk_size]
+                        )
+                        / 4
+                        + self.random_value(random_scalar)
                     )
 
             for y in range(0, self.map_size, chunk_size_half):
-                for x in range((y + chunk_size_half) % chunk_size, self.map_size, chunk_size):
-                    # if x == 0:
-                    #     x = chunk_size
+                for x in range(
+                    (y + chunk_size_half) % chunk_size, self.map_size, chunk_size
+                ):
                     sum_ = 0
                     count = 0
                     if x - chunk_size_half > 0:
@@ -231,7 +242,9 @@ class DiamondSquare:
                     if y + chunk_size_half < self.map_size:
                         sum_ += self.height_map[y + chunk_size_half][x]
                         count += 1
-                    self.height_map[y][x] = self.round_and_clamp(sum_ / count + self.random_value(random_scalar))
+                    self.height_map[y][x] = self.round_and_clamp(
+                        sum_ / count + self.random_value(random_scalar)
+                    )
 
             chunk_size = chunk_size // 2
             random_scalar = max(random_scalar / 2, 0.1)
@@ -239,7 +252,6 @@ class DiamondSquare:
         return self.height_map
 
     def convert_to_str(self) -> list[str]:
-
         self.map_str = []
         for row in self.height_map:
             new_row = ""
@@ -257,13 +269,13 @@ class DiamondSquare:
         print(f"Roughness   : {self.roughness}")
         print(f"Random seed : {self.random_seed}")
         print(f"Palette     : {self.palette}")
-        # for color in self.mapping:
+
         console.print(self.get_palette_preview())
         console.print("\nHeight map  :")
 
         self.grid = "\n".join(self.convert_to_str())
         pixels = Pixels.from_ascii(self.grid, self.mapping)
-        # console.print(Panel(pixels, title="Map"))
+
         console.print(pixels)
         console.print("")
 
@@ -287,11 +299,14 @@ class DiamondSquare:
         with open(file_name, "w", encoding="utf-8") as f:
             json.dump(self.map_str, f, indent=JSON_INDENT)
 
+        print(f"Saved map to {file_name}.")
+
     def save_to_xp(self):
         if len(self.map_str) == 0:
             self.convert_to_str()
 
-        self.save_palette()
+        # self.save_palette()
+
         if self.legend_layer is None:
             self.load_legend_from_xp()
         new_legend = deepcopy(self.legend_layer)
@@ -305,50 +320,64 @@ class DiamondSquare:
         settings_list.append(str(self.roughness))
 
         for j, setting in enumerate(settings_list):
-            tile = new_legend.tiles[self.xp_pos(5+j, 15, new_legend)]
+            tile = new_legend.tiles[self.xp_pos(5 + j, 15, new_legend)]
             for i, c in enumerate(setting):
-                # print(i, c)
                 tile = deepcopy(tile)
                 tile.ascii_code = c
-                new_legend.tiles[self.xp_pos(5+j, 15+i, new_legend)] = tile
+                new_legend.tiles[self.xp_pos(5 + j, 15 + i, new_legend)] = tile
 
-        # file_name = f"..\\REXPaint\\images\\{self.map_name}.xp" # windows setup
-        # file_name = f"{MAPS_FOLDER}\\{self.map_name}.xp"  # macos setup
-        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.xp"  # macos setup
-        with open(file_name, 'wb') as fp:
-            fp.write(struct.pack('i', 1))  # version
-            fp.write(struct.pack('i', 3))  # layers
-            fp.write(struct.pack('i', len(self.height_map[0])))
-            fp.write(struct.pack('i', len(self.height_map)))
-            # write background color layer
+        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.xp"
+        with open(file_name, "wb") as fp:
+            # write header
+            fp.write(struct.pack("i", 1))  # version
+            fp.write(struct.pack("i", 3))  # layers
+            fp.write(struct.pack("i", len(self.height_map[0])))
+            fp.write(struct.pack("i", len(self.height_map)))
+
+            # write background color layer (1)
             for x in range(len(self.height_map)):
                 for y in range(len(self.height_map[0])):
                     ch_int = -1 + ord(FIRST_MAP_CHAR) + self.height_map[y][x]
                     ch_str = chr(ch_int)
-                    fp.write(struct.pack('i', ch_int))
-                    # fp.write(struct.pack('i', ord(" ")))
-                    # fp.write(struct.pack('BBBBBB', *self.palette_dict[ch_str]["fg"], *self.palette_dict[ch_str]["bg"]))
-                    fp.write(struct.pack('BBBBBB', *self.palette_dict[ch_str]["bg"], *self.palette_dict[ch_str]["bg"]))
-            # write ASCII code layer
-            fp.write(struct.pack('i', len(self.height_map[0])))
-            fp.write(struct.pack('i', len(self.height_map)))
+                    # fp.write(struct.pack("i", ch_int))
+                    fp.write(struct.pack("i", ord(" ")))
+                    fp.write(
+                        struct.pack(
+                            "BBBBBB",
+                            *self.palette_dict[ch_str]["bg"],
+                            *self.palette_dict[ch_str]["bg"],
+                        )
+                    )
+
+            # write ASCII code mapped height layer (2)
+            fp.write(struct.pack("i", len(self.height_map[0])))
+            fp.write(struct.pack("i", len(self.height_map)))
             for x in range(len(self.height_map)):
                 for y in range(len(self.height_map[0])):
                     ch_int = -1 + ord(FIRST_MAP_CHAR) + self.height_map[y][x]
                     ch_str = chr(ch_int)
-                    fp.write(struct.pack('i', ch_int))
-                    # fp.write(struct.pack('i', ord(" ")))
-                    # fp.write(struct.pack('BBBBBB', *self.palette_dict[ch_str]["fg"], *self.palette_dict[ch_str]["bg"]))
-                    fp.write(struct.pack('BBBBBB', 255, 255, 255, 0, 0, 0))
-            # write legend layer
-            fp.write(struct.pack('i', new_legend.width))
-            fp.write(struct.pack('i', new_legend.height))
+                    fp.write(struct.pack("i", ch_int))
+                    # white letters on black background
+                    fp.write(struct.pack("BBBBBB", 255, 255, 255, 0, 0, 0))
+
+            # write legend layer (3)
+            fp.write(struct.pack("i", new_legend.width))
+            fp.write(struct.pack("i", new_legend.height))
             for tile in new_legend.tiles:
+                fp.write(struct.pack("i", ord(tile.ascii_code)))
+                fp.write(
+                    struct.pack(
+                        "BBBBBB",
+                        tile.fg_r,
+                        tile.fg_g,
+                        tile.fg_b,
+                        tile.bg_r,
+                        tile.bg_g,
+                        tile.bg_b,
+                    )
+                )
 
-                fp.write(struct.pack('i', ord(tile.ascii_code)))
-                # fp.write(struct.pack('BBBBBB', *self.palette_dict[ch_str]["fg"], *self.palette_dict[ch_str]["bg"]))
-                fp.write(struct.pack('BBBBBB', tile.fg_r, tile.fg_g, tile.fg_b, tile.bg_r, tile.bg_g, tile.bg_b))
-        print(f"Saved map '{self.map_name}' to {file_name}.")
+        print(f"Saved map to {file_name}.")
 
     def save_palette(self):
         palette_size = len(self.palette_dict)
@@ -358,9 +387,9 @@ class DiamondSquare:
 
         # Rexpaint palette color format is {r,g,b}\t
         for c in self.palette_dict:
-            fg_r, fg_g, fg_b = self.palette_dict[c]['fg']
+            fg_r, fg_g, fg_b = self.palette_dict[c]["fg"]
             fg_colors_line += f"{{{fg_r},{fg_g},{fg_b}}}\t"
-            bg_r, bg_g, bg_b = self.palette_dict[c]['bg']
+            bg_r, bg_g, bg_b = self.palette_dict[c]["bg"]
             bg_colors_line += f"{{{bg_r},{bg_g},{bg_b}}}\t"
 
         # Rexpaint requires 16 colors per line in the palette
@@ -374,29 +403,25 @@ class DiamondSquare:
             f.writelines([f"{bg_colors_line}\n" for _ in range(5)])
             f.writelines(f"{bg_colors_line}")  # no new line at the end of file
 
-        print(f"Saved palette '{self.palette}' to {file_name}. Copy to Rexpaint under data\\palette folder.")
+        print(
+            f"Saved palette to {file_name}. Copy to Rexpaint under data\\palette folder."
+        )
 
     def xp_pos(self, x, y, layer):
         return (y * layer.height) + x
 
     def load_legend_from_xp(self):
-        # file_name = f"..\\REXPaint\\images\\{self.map_name}.xp" # windows setup
-
-        # file_name = f"{MAPS_FOLDER}\\{self.map_name}.xp"  # macos setup
         file_name = Path(MAPS_FOLDER) / "legend.xp"
         legend_layers = pyrexpaint.load(str(file_name))
 
         if len(legend_layers) > 0:
             self.legend_layer = legend_layers[0]
             for tile in self.legend_layer.tiles:
-                c = cast(bytes, tile.ascii_code).decode('cp437')
+                c = cast(bytes, tile.ascii_code).decode("cp437")
                 c = c.replace(chr(0), "")
                 tile.ascii_code = c
 
     def load_from_xp(self):
-        # file_name = f"..\\REXPaint\\images\\{self.map_name}.xp" # windows setup
-
-        # file_name = f"{MAPS_FOLDER}\\{self.map_name}.xp"  # macos setup
         file_name = Path(MAPS_FOLDER) / f"{self.map_name}.xp"
         self.image_layers = pyrexpaint.load(str(file_name))
 
@@ -423,13 +448,14 @@ class DiamondSquare:
                         pass
                         # val = colors_map[color_id]
 
-                    char = cast(bytes, tile.ascii_code).decode('cp437')  # encode('cp437').decode("utf-8")
+                    char = cast(bytes, tile.ascii_code).decode(
+                        "cp437"
+                    )  # encode('cp437').decode("utf-8")
 
                     char = char.replace(chr(0), "")
                     # console.print(char, end="")
                     val = ord(char) - ord(FIRST_MAP_CHAR) + 1
                     row.append(val)
-                # console.print("")
                 self.height_map.append(row)
 
             # self.palette16_dict["custom"] = p
@@ -438,7 +464,10 @@ class DiamondSquare:
             # self.generate()
 
 
-@tui()
+@tui(
+    command="tui",
+    help="Open terminal UI to set generation parameters. This will lunch a beautiful 'graphic-like' interface, but it's still a terminal application. Try it!",
+)
 @click.option(
     "--map-size",
     "-m",
@@ -471,27 +500,27 @@ class DiamondSquare:
     help="Maximum height value (min is always 1). In order to properly display in console, max height must be lower or equal the number of colors in selected palette (the biggest palette is 128). While exporting to files, max height is not limited.",
 )
 @click.option(
-    '--print/--no-print',
+    "--print/--no-print",
     default=True,
-    help="Print height map to console (default True)."
+    help="Print height map to console (default True).",
 )
 @click.option(
-    '--export-xp-filename',
-    '-x',
-    'export_xp',
+    "--export-xp-filename",
+    "-x",
+    "export_xp",
     type=str,
     # is_flag=True,
-    default=MAP_NAME,
-    help="File name (without extension) to export map using Rexpaint file format (.xp)."
+    # default=MAP_NAME,
+    help="File name (without extension) to export map using Rexpaint file format (.xp).",
 )
 @click.option(
-    '--export-json-filename',
-    '-j',
-    'export_json',
+    "--export-json-filename",
+    "-j",
+    "export_json",
     type=str,
     # is_flag=True,
-    default=MAP_NAME,
-    help="File name (without extension) to export map using json format (.json)."
+    # default=MAP_NAME,
+    help="File name (without extension) to export map using json format (.json).",
 )
 @click.option(
     "--seed",
@@ -500,7 +529,9 @@ class DiamondSquare:
     type=int,
     help="Seed for random number generator. Skip to get random maps with each run. If you like the results make sure to note currently used seed. Use explicit value to generate the same map multiple times, still being able to fine tune it (e.g. change roughness level or palette).",
 )
-@click.command()
+@click.command(
+    help="Generate height map using diamond square algorithm. Add 'generate --help' to your command to get more help the parameters or use 'tui' command instead 'generate'."
+)
 def generate(
     map_size: str,
     roughness: float,
@@ -518,27 +549,27 @@ def generate(
         random_seed_int = random_seed
     if height_max is None:
         height_max = HEIGHT_MAX
-    # roughness = 16.0
-    # height_max = 16
-    # palette = "landscape_16"
     map_name = MAP_NAME
-    # if export_xp:
-    #     map_name = export_xp
+
     ds = DiamondSquare(
         map_size_int,
         roughness=roughness,
         random_seed=random_seed_int,
         height_max=height_max,
         map_name=map_name,
-        palette=palette
+        palette=palette,
     )
+
     ds.generate()
+
     if export_xp:
         ds.map_name = export_xp
         ds.save_to_xp()
+
     if export_json:
         ds.map_name = export_json
         ds.save_to_json()
+
     if print:
         ds.print_height_map()
 
