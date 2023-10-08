@@ -4,12 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.1] - 2023-10-08
+
+### Features
+
+- added export to png (using Pillow)
+- added example maps and screenshot
+
+### Fixes
+
+- fixed legend print formatting (now all prints use rich console)
+- fixed json export
+
 ## [0.1.0] - 2023-10-07
 
 - Initial release: first working version!
 - added license, changelog, run.sh script, made it a runnable module
 
-[Unreleased]: https://github.com/tconbeer/textual-textarea/compare/0.7.3...HEAD
+[Unreleased]: https://github.com/tconbeer/textual-textarea/compare/0.2.0...HEAD
 
 [0.1.1]: https://github.com/HubertReX/tui-map-generator/compare/0.1.0...0.1.1
 
