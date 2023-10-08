@@ -2,7 +2,7 @@
 
 Height map 🗺 generator using **diamond square** 💎🔷 with TUI 🖥️ interface.
 
-![maps/example_01.png](maps/example_01.png)
+![maps/example_01.png](https://raw.githubusercontent.com/HubertReX/tui-map-generator/main/maps/example_01.png)
 
 ## What for?
 
@@ -18,7 +18,7 @@ With several parameters you can customize the size, roughness and color palette.
 
 To make it easier to use, there is a **TUI** interface. This gives you a '_graphical_'-like user interface in the terminal (hence the name **TUI**). This way you can use it in a console without any kind of graphical interface. And yes, the mouse works too! 🐭
 
-![maps/screenshot_01_tui.png](maps/screenshot_01_tui.png)
+![maps/screenshot_01_tui.png](https://raw.githubusercontent.com/HubertReX/tui-map-generator/main/maps/screenshot_01_tui.png)
 
 ### The Game
 
@@ -35,10 +35,6 @@ All platforms should work, but I've tested it only on **MacOS**. If you have any
 ## Installation
 
 ### Public repository
-
-TODO: not yet published on PyPI
-
-```bash
 
 ```bash
 pip install tui-map-generator
@@ -166,7 +162,7 @@ Random seed: 2994
 
 Palette: landscape_16
 
-![maps/example_01.png](maps/example_01.png)
+![maps/example_01.png](https://raw.githubusercontent.com/HubertReX/tui-map-generator/main/maps/example_01.png)
 
 ## maps/example_02
 
@@ -182,7 +178,7 @@ Random seed: 4948
 
 Palette: grey_64
 
-![maps/example_02.png](maps/example_02.png)
+![maps/example_02.png](https://raw.githubusercontent.com/HubertReX/tui-map-generator/main/maps/example_02.png)
 
 ## maps/example_03
 
@@ -198,7 +194,7 @@ Random seed: 6956
 
 Palette: landscape_8
 
-![maps/example_03.png](maps/example_03.png)
+![maps/example_03.png](https://raw.githubusercontent.com/HubertReX/tui-map-generator/main/maps/example_03.png)
 
 ## Under the hood
 
