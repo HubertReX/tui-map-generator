@@ -196,6 +196,10 @@ class DiamondSquare:
         random.seed(self.random_seed)
         self.init_height_map()
         self.build_palette()
+        if len(self.palette_dict) < self.height_max:
+            raise Exception(
+                f"Palette '{self.palette}' has only {len(self.palette_dict)} colors. Max height must be lower or equal to the number of colors in selected palette."
+            )
         self.diamond_square()
         return self.height_map
 
