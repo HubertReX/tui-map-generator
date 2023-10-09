@@ -209,4 +209,4 @@ Here are some some of the libraries used in this project:
 
 ### Inspirations
 
-This implementation is based on [example-diamond-square](https://github.com/klaytonkowalski/example-diamond-square) project written in **Lua** using **Defold** engine. See the author him self, explaining the whole **diamond square** 💎🔷 algorithm: [YouTube video](https://www.youtube.com/watch?v=4GuAV1PnurU&ab_channel=WhiteBoxDev).
+This implementation is based on [example-diamond-square](https://github.com/klaytonkowalski/example-diamond-square) project written in **Lua** using **Defold** engine. See the author him self, explaining the whole **diamond square** 💎🔷 algorithm: [YouTube video](https://www.youtube.com/watch?v=4GuAV1PnurU&ab_channel=WhiteBoxDev). More on the process of building my implementation can be found on my [blogpost](https://hubertnafalski.itch.io/ssis/devlog/618072/002-detours-in-the-game-development).
