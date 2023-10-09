@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tui-map-generator"
-version = "0.1.2"
+version = "0.1.6"
 description = "Height map generator using diamond square with TUI interface"
 authors = ["Hubert Nafalski <HubertReX@users.noreply.github.com>"]
 license = "GPL-3.0-only"
@@ -8,6 +8,9 @@ homepage = "https://github.com/HubertReX/tui-map-generator"
 repository = "https://github.com/HubertReX/tui-map-generator"
 readme = "README.md"
 packages = [{ include = "tui_map_generator", from = "src" }]
+include = [
+    { path = "src/tui_map_generator/maps/legend.xp", format = ["sdist", "wheel"] }
+]
 
 [tool.poetry.scripts]
 tui-map-generator = "tui_map_generator:__main__"
