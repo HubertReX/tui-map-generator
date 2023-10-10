@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.8] - 2023-10-10
+
+- fixed running using script (./tui-map-generator)
+
 ## [0.1.7] - 2023-10-10
 
 - fixed problem with missing maps folder
@@ -50,6 +54,8 @@ All notable changes to this project will be documented in this file.
 - added license, changelog, run.sh script, made it a runnable module
 
 [Unreleased]: https://github.com/tconbeer/textual-textarea/compare/0.2.0...HEAD
+
+[0.1.8]: https://github.com/HubertReX/tui-map-generator/compare/0.1.7...0.1.8
 
 [0.1.7]: https://github.com/HubertReX/tui-map-generator/compare/0.1.6...0.1.7
 
