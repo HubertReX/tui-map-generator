@@ -309,14 +309,22 @@ class DiamondSquare:
             # "glyph_map": self.map_str,
         }
 
-        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.json"
+        maps_folder = self.fix_maps_folder()
+        file_name = maps_folder / f"{self.map_name}.json"
         with open(file_name, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=JSON_INDENT)
 
         self.console.print(f"Map saved to '[bold]{file_name}[/]'.")
 
+    def fix_maps_folder(self):
+        maps_folder = Path(MAPS_FOLDER)
+        if not maps_folder.exists():
+            maps_folder.mkdir()
+        return maps_folder
+
     def save_to_png(self, scale_up: int):
-        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.png"
+        maps_folder = self.fix_maps_folder()
+        file_name = maps_folder / f"{self.map_name}.png"
 
         size = len(self.height_map[0])
         img = np.zeros((size, size, 3), dtype=np.uint8)
@@ -386,7 +394,8 @@ class DiamondSquare:
                 XP_LEGEND_START_X, XP_LEGEND_START_Y + j, legend_layer, str(value)
             )
 
-        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.xp"
+        maps_folder = self.fix_maps_folder()
+        file_name = maps_folder / f"{self.map_name}.xp"
         with open(file_name, "wb") as fp:
             # write header
             fp.write(struct.pack("i", 1))  # version
@@ -450,7 +459,8 @@ class DiamondSquare:
 
     def save_palette(self):
         palette_size = len(self.palette_dict)
-        file_name = Path(MAPS_FOLDER) / f"{self.palette}_{palette_size}_SSiS.txt"
+        maps_folder = self.fix_maps_folder()
+        file_name = maps_folder / f"{self.palette}_{palette_size}_SSiS.txt"
         bg_colors_line = ""
         fg_colors_line = ""
 
@@ -481,6 +491,10 @@ class DiamondSquare:
 
     def load_legend_from_xp(self):
         file_name = Path(__file__).parent / Path(MAPS_FOLDER) / "legend.xp"
+        if not file_name.exists():
+            raise Exception(
+                f"Rexpaint file with legend template '{file_name}' not found. Perhaps your installation of tui_map_generator has been corrupted. Try to reinstall it."
+            )
         legend_layers = pyrexpaint.load(str(file_name))
 
         if len(legend_layers) > 0:
@@ -491,7 +505,8 @@ class DiamondSquare:
                 tile.ascii_code = c
 
     def load_from_xp(self):
-        file_name = Path(MAPS_FOLDER) / f"{self.map_name}.xp"
+        maps_folder = self.fix_maps_folder()
+        file_name = maps_folder / f"{self.map_name}.xp"
         self.image_layers = pyrexpaint.load(str(file_name))
 
         if len(self.image_layers) > 0:

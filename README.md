@@ -28,9 +28,9 @@ I'm personally using this tool to generate maps for my game called [**SSiS**](ht
 
 All platforms should work, but I've tested it only on **MacOS**. If you have any problems, please create an issue.
 
-- **Linux** ❓ (should work, not tested)
-- **Windows** ❓ (should work, not tested)
-- **MacOS** works fine ✅
+- **Linux** works fine ✅ (tested on Ubuntu 22 with gnome-terminal)
+- **Windows** works fine ✅ (tested on wt and cmd)
+- **MacOS** works fine ✅ (tested on iTerm2 and Terminal.app)
 
 ## Installation
 
