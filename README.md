@@ -77,6 +77,12 @@ write this command to see all available options:
 python3 -m tui-map-generator generate --help
 ```
 
+or simply
+
+```bash
+tui-map-generator generate --help
+```
+
 to see something like this:
 
 ```bash
@@ -138,12 +144,23 @@ To quickly see how it works, skip all parameters (use default) and write this co
 python3 -m tui-map-generator generate
 ```
 
+or simply
+```bash
+tui-map-generator generate
+```
+
 ### 2. TUI interface
 
 write this command to start TUI interface:
 
 ```bash
 python3 -m tui-map-generator tui
+```
+
+or simply
+
+```bash
+tui-map-generator tui
 ```
 
 ## Examples
