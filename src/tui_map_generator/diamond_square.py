@@ -387,7 +387,7 @@ class DiamondSquare:
             self.load_legend_from_xp()
 
         legend_layer = deepcopy(self.xp_legend_layer)
-
+        self.generate_legend_dict()
         for j, (label, value) in enumerate(self.txt_legend_dict.items()):
             self.text_to_tiles(0, XP_LEGEND_START_Y + j, legend_layer, label)
             self.text_to_tiles(
@@ -546,3 +546,11 @@ class DiamondSquare:
             # self.palette = "custom"
             # self.build_palette()
             # self.generate()
+
+
+if __name__ == "__main__":
+    ds = DiamondSquare(HEIGHT_MAP_SIZE, map_name="map01_new_world2")
+    ds.load_from_xp()
+    ds.print_height_map()
+
+    # bg_r, bg_g, bg_b = ds.palette_dict[symbol]["bg"]
