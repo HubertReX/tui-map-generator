@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- added custom char map to handle 128 chars/height values
+- added flag to export glyphs to xp
+- fixed generations of gray scale palettes
+- added default value for scale_up in save_to_png function
+- fixed legend.xp annotations
+
 ## [0.1.8] - 2023-10-10
 
 - fixed running using script (./tui-map-generator)

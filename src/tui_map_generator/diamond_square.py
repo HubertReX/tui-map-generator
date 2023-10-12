@@ -3,6 +3,7 @@ import json
 import random
 import math
 import numpy as np
+import string
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 from sys import argv
@@ -22,14 +23,16 @@ HEIGHT_MAX: int = 16
 # must be n^2 + 1
 HEIGHT_MAP_SIZE = 65
 ROUGHNESS: float = 16.0
-RANDOM_SCALAR: float = ROUGHNESS
+# RANDOM_SCALAR: float = ROUGHNESS
 RANDOM_SEED = 111
 ALGORITHM_NAME = "diamond square"
 COLOR_PALETTE = "landscape_16"
-SCALE_UP = 1
-PRINT_FORMAT_LEN: int = 3
+SCALE_UP = 10
+# PRINT_FORMAT_LEN: int = 3
 JSON_INDENT: int = 4
-FIRST_MAP_CHAR: str = "A"
+HEIGHT_TO_CHR_MAPPING = (
+    list(string.ascii_letters) + list("#$%&*=,.~+@^") + list(map(chr, range(191, 255)))
+)
 MAPS_FOLDER: str = "maps"
 MAP_NAME: str = "height_map"
 XP_LEGEND_START_X = 17
@@ -46,38 +49,38 @@ def build_default_palettes():
     global PALETTES_DICT
     PALETTES_DICT = {
         "landscape_4": {
-            "A": {"fg": (255, 255, 255), "bg": (000, 000, 255)},
-            "B": {"fg": (255, 255, 255), "bg": (215, 175, 000)},
-            "C": {"fg": (255, 255, 255), "bg": (000, 191, 000)},
-            "D": {"fg": (000, 000, 000), "bg": (255, 255, 255)},
+            HEIGHT_TO_CHR_MAPPING[0]: {"fg": (255, 255, 255), "bg": (000, 000, 255)},
+            HEIGHT_TO_CHR_MAPPING[1]: {"fg": (255, 255, 255), "bg": (215, 175, 000)},
+            HEIGHT_TO_CHR_MAPPING[2]: {"fg": (255, 255, 255), "bg": (000, 191, 000)},
+            HEIGHT_TO_CHR_MAPPING[3]: {"fg": (000, 000, 000), "bg": (255, 255, 255)},
         },
         "landscape_8": {
-            "A": {"fg": (255, 255, 255), "bg": (000, 000, 63)},
-            "B": {"fg": (255, 255, 255), "bg": (000, 000, 255)},
-            "C": {"fg": (255, 255, 255), "bg": (215, 175, 000)},
-            "D": {"fg": (255, 255, 255), "bg": (000, 191, 000)},
-            "E": {"fg": (255, 255, 255), "bg": (000, 63, 000)},
-            "F": {"fg": (255, 255, 255), "bg": (138, 117, 88)},
-            "G": {"fg": (000, 000, 000), "bg": (85, 85, 85)},
-            "H": {"fg": (000, 000, 000), "bg": (255, 255, 255)},
+            HEIGHT_TO_CHR_MAPPING[0]: {"fg": (255, 255, 255), "bg": (000, 000, 63)},
+            HEIGHT_TO_CHR_MAPPING[1]: {"fg": (255, 255, 255), "bg": (000, 000, 255)},
+            HEIGHT_TO_CHR_MAPPING[2]: {"fg": (255, 255, 255), "bg": (215, 175, 000)},
+            HEIGHT_TO_CHR_MAPPING[3]: {"fg": (255, 255, 255), "bg": (000, 191, 000)},
+            HEIGHT_TO_CHR_MAPPING[4]: {"fg": (255, 255, 255), "bg": (000, 63, 000)},
+            HEIGHT_TO_CHR_MAPPING[5]: {"fg": (255, 255, 255), "bg": (138, 117, 88)},
+            HEIGHT_TO_CHR_MAPPING[6]: {"fg": (000, 000, 000), "bg": (85, 85, 85)},
+            HEIGHT_TO_CHR_MAPPING[7]: {"fg": (000, 000, 000), "bg": (255, 255, 255)},
         },
         "landscape_16": {
-            "A": {"fg": (255, 255, 255), "bg": (000, 000, 63)},
-            "B": {"fg": (255, 255, 255), "bg": (000, 000, 127)},
-            "C": {"fg": (255, 255, 255), "bg": (000, 000, 191)},
-            "D": {"fg": (255, 255, 255), "bg": (000, 000, 255)},
-            "E": {"fg": (255, 255, 255), "bg": (215, 175, 000)},
-            "F": {"fg": (255, 255, 255), "bg": (000, 191, 000)},
-            "G": {"fg": (255, 255, 255), "bg": (000, 127, 000)},
-            "H": {"fg": (255, 255, 255), "bg": (000, 63, 000)},
-            "I": {"fg": (255, 255, 255), "bg": (81, 69, 52)},
-            "J": {"fg": (255, 255, 255), "bg": (100, 85, 64)},
-            "K": {"fg": (255, 255, 255), "bg": (119, 101, 76)},
-            "L": {"fg": (255, 255, 255), "bg": (138, 117, 88)},
-            "M": {"fg": (000, 000, 000), "bg": (85, 85, 85)},
-            "N": {"fg": (000, 000, 000), "bg": (135, 135, 135)},
-            "O": {"fg": (000, 000, 000), "bg": (150, 150, 150)},
-            "P": {"fg": (000, 000, 000), "bg": (255, 255, 255)},
+            HEIGHT_TO_CHR_MAPPING[0]: {"fg": (255, 255, 255), "bg": (000, 000, 63)},
+            HEIGHT_TO_CHR_MAPPING[1]: {"fg": (255, 255, 255), "bg": (000, 000, 127)},
+            HEIGHT_TO_CHR_MAPPING[2]: {"fg": (255, 255, 255), "bg": (000, 000, 191)},
+            HEIGHT_TO_CHR_MAPPING[3]: {"fg": (255, 255, 255), "bg": (000, 000, 255)},
+            HEIGHT_TO_CHR_MAPPING[4]: {"fg": (255, 255, 255), "bg": (215, 175, 000)},
+            HEIGHT_TO_CHR_MAPPING[5]: {"fg": (255, 255, 255), "bg": (000, 191, 000)},
+            HEIGHT_TO_CHR_MAPPING[6]: {"fg": (255, 255, 255), "bg": (000, 127, 000)},
+            HEIGHT_TO_CHR_MAPPING[7]: {"fg": (255, 255, 255), "bg": (000, 63, 000)},
+            HEIGHT_TO_CHR_MAPPING[8]: {"fg": (255, 255, 255), "bg": (81, 69, 52)},
+            HEIGHT_TO_CHR_MAPPING[9]: {"fg": (255, 255, 255), "bg": (100, 85, 64)},
+            HEIGHT_TO_CHR_MAPPING[10]: {"fg": (255, 255, 255), "bg": (119, 101, 76)},
+            HEIGHT_TO_CHR_MAPPING[11]: {"fg": (255, 255, 255), "bg": (138, 117, 88)},
+            HEIGHT_TO_CHR_MAPPING[12]: {"fg": (000, 000, 000), "bg": (85, 85, 85)},
+            HEIGHT_TO_CHR_MAPPING[13]: {"fg": (000, 000, 000), "bg": (135, 135, 135)},
+            HEIGHT_TO_CHR_MAPPING[14]: {"fg": (000, 000, 000), "bg": (150, 150, 150)},
+            HEIGHT_TO_CHR_MAPPING[15]: {"fg": (000, 000, 000), "bg": (255, 255, 255)},
         },
     }
 
@@ -104,10 +107,10 @@ def build_default_palettes():
 
 
 def build_default_palette(no_shades: int, colors: list[int]) -> dict[str, dict]:
-    step = 255 // no_shades
+    step = round(255 / no_shades)
     p = {}
     for x in range(no_shades):
-        p[chr(ord(FIRST_MAP_CHAR) + x)] = {
+        p[HEIGHT_TO_CHR_MAPPING[x]] = {
             "fg": (255, 255, 255),
             "bg": (x * step * colors[0], x * step * colors[1], x * step * colors[2]),
         }
@@ -150,6 +153,7 @@ class DiamondSquare:
             self.palette = COLOR_PALETTE
 
         self.build_palette()
+        self.export_glyphs = EXPORT_GLYPHS_LAYER
 
     def build_palette(self):
         self.palette_dict = PALETTES_DICT[self.palette]
@@ -263,8 +267,7 @@ class DiamondSquare:
         for row in self.height_map:
             new_row = ""
             for col in row:
-                c = chr(-1 + ord(FIRST_MAP_CHAR) + col)
-                new_row += c
+                new_row += HEIGHT_TO_CHR_MAPPING[col - 1]
             self.map_str.append(new_row)
         return self.map_str
 
@@ -322,7 +325,7 @@ class DiamondSquare:
             maps_folder.mkdir()
         return maps_folder
 
-    def save_to_png(self, scale_up: int):
+    def save_to_png(self, scale_up: int = SCALE_UP):
         maps_folder = self.fix_maps_folder()
         file_name = maps_folder / f"{self.map_name}.png"
 
@@ -332,8 +335,7 @@ class DiamondSquare:
         for x in range(len(self.height_map)):
             for y in range(len(self.height_map[0])):
                 height = self.height_map[y][x]
-                ch_int = -1 + ord(FIRST_MAP_CHAR) + height
-                ch_str = chr(ch_int)
+                ch_str = HEIGHT_TO_CHR_MAPPING[height - 1]
 
                 img[y][x] = self.palette_dict[ch_str]["bg"]
 
@@ -375,8 +377,8 @@ class DiamondSquare:
     def save_to_xp(self):
         layers_no = 2
 
-        if EXPORT_GLYPHS_LAYER:
-            layers_no = 3
+        if self.export_glyphs:
+            layers_no += 1
 
         # if len(self.map_str) == 0:
         #     self.convert_to_str()
@@ -386,6 +388,10 @@ class DiamondSquare:
         if self.xp_legend_layer is None:
             self.load_legend_from_xp()
 
+        if self.xp_legend_layer is None:
+            raise Exception(
+                f"Rexpaint file with legend template not found. Perhaps your installation of tui_map_generator has been corrupted. Try to reinstall it."
+            )
         legend_layer = deepcopy(self.xp_legend_layer)
         self.generate_legend_dict()
         for j, (label, value) in enumerate(self.txt_legend_dict.items()):
@@ -406,10 +412,12 @@ class DiamondSquare:
             # write background color layer (1)
             for x in range(len(self.height_map)):
                 for y in range(len(self.height_map[0])):
-                    ch_int = -1 + ord(FIRST_MAP_CHAR) + self.height_map[y][x]
-                    ch_str = chr(ch_int)
-                    # fp.write(struct.pack("i", ch_int))
-                    fp.write(struct.pack("i", ord(" ")))
+                    ch_str = HEIGHT_TO_CHR_MAPPING[self.height_map[y][x] - 1]
+                    ch_int = ord(ch_str)
+                    if self.export_glyphs:
+                        fp.write(struct.pack("i", ch_int))
+                    else:
+                        fp.write(struct.pack("i", ord(" ")))
                     fp.write(
                         struct.pack(
                             "BBBBBB",
@@ -419,13 +427,13 @@ class DiamondSquare:
                     )
 
             # write ASCII code mapped height layer (2)
-            if EXPORT_GLYPHS_LAYER:
+            if self.export_glyphs:
                 fp.write(struct.pack("i", len(self.height_map[0])))
                 fp.write(struct.pack("i", len(self.height_map)))
                 for x in range(len(self.height_map)):
                     for y in range(len(self.height_map[0])):
-                        ch_int = -1 + ord(FIRST_MAP_CHAR) + self.height_map[y][x]
-                        ch_str = chr(ch_int)
+                        ch_str = HEIGHT_TO_CHR_MAPPING[self.height_map[y][x] - 1]
+                        ch_int = ord(ch_str)
                         fp.write(struct.pack("i", ch_int))
                         # white letters on black background
                         fp.write(struct.pack("BBBBBB", 255, 255, 255, 0, 0, 0))
@@ -538,7 +546,7 @@ class DiamondSquare:
 
                     char = char.replace(chr(0), "")
                     # console.print(char, end="")
-                    val = ord(char) - ord(FIRST_MAP_CHAR) + 1
+                    val = HEIGHT_TO_CHR_MAPPING.index(char) + 1
                     row.append(val)
                 self.height_map.append(row)
 
@@ -549,8 +557,13 @@ class DiamondSquare:
 
 
 if __name__ == "__main__":
-    ds = DiamondSquare(HEIGHT_MAP_SIZE, map_name="map01_new_world2")
-    ds.load_from_xp()
+    ds = DiamondSquare(HEIGHT_MAP_SIZE, map_name="test_01")
+    # ds.load_from_xp()
+    ds.export_glyphs = True
+    ds.generate()
+    ds.save_to_xp()
+    ds.save_to_png()
+    ds.save_to_json()
     ds.print_height_map()
 
     # bg_r, bg_g, bg_b = ds.palette_dict[symbol]["bg"]
