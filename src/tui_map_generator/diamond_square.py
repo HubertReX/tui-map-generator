@@ -145,6 +145,8 @@ class DiamondSquare:
         self.txt_legend_dict = {}
         self.height_map: THeightMap = self.init_height_map()
         self.map_str = {}
+        self.glyph_map = []
+        self.glyphs = []
         self.load_legend_from_xp()
 
         if palette in PALETTES_DICT:
@@ -267,9 +269,25 @@ class DiamondSquare:
         for row in self.height_map:
             new_row = ""
             for col in row:
-                new_row += HEIGHT_TO_CHR_MAPPING[col - 1]
+                if self.palette == "custom":
+                    new_row += chr(col)
+                else:
+                    new_row += HEIGHT_TO_CHR_MAPPING[col - 1]
             self.map_str.append(new_row)
         return self.map_str
+
+    def convert_from_str(self):
+        self.height_map = []
+
+        for row in self.map_str:
+            new_row = []
+            for col in row:
+                if self.palette == "custom" or col not in HEIGHT_TO_CHR_MAPPING:
+                    new_row.append(ord(col))
+                else:
+                    new_row.append(HEIGHT_TO_CHR_MAPPING.index(col))
+            self.height_map.append(new_row)
+        return
 
     def print_height_map(self):
         padding = 15
@@ -410,8 +428,8 @@ class DiamondSquare:
             fp.write(struct.pack("i", len(self.height_map)))
 
             # write background color layer (1)
-            for x in range(len(self.height_map)):
-                for y in range(len(self.height_map[0])):
+            for x in range(len(self.height_map[0])):
+                for y in range(len(self.height_map)):
                     ch_str = HEIGHT_TO_CHR_MAPPING[self.height_map[y][x] - 1]
                     ch_int = ord(ch_str)
                     if self.export_glyphs:
@@ -421,7 +439,7 @@ class DiamondSquare:
                     fp.write(
                         struct.pack(
                             "BBBBBB",
-                            *self.palette_dict[ch_str]["bg"],
+                            *self.palette_dict[ch_str]["fg"],
                             *self.palette_dict[ch_str]["bg"],
                         )
                     )
@@ -430,8 +448,8 @@ class DiamondSquare:
             if self.export_glyphs:
                 fp.write(struct.pack("i", len(self.height_map[0])))
                 fp.write(struct.pack("i", len(self.height_map)))
-                for x in range(len(self.height_map)):
-                    for y in range(len(self.height_map[0])):
+                for x in range(len(self.height_map[0])):
+                    for y in range(len(self.height_map)):
                         ch_str = HEIGHT_TO_CHR_MAPPING[self.height_map[y][x] - 1]
                         ch_int = ord(ch_str)
                         fp.write(struct.pack("i", ch_int))
@@ -517,43 +535,62 @@ class DiamondSquare:
         file_name = maps_folder / f"{self.map_name}.xp"
         self.image_layers = pyrexpaint.load(str(file_name))
 
+        # read background layer
         if len(self.image_layers) > 0:
             self.xp_layer = self.image_layers[0]
             self.map_size = max(self.xp_layer.width, self.xp_layer.height)
             self.height_map = []
-            color_index = 1
-            colors_map = {}
+            # color_index = 1
+            # colors_map = {}
             p = {}
-            for i in range(self.xp_layer.width):
+            for i in range(self.xp_layer.height):
                 row: list[int] = []
-                for j in range(self.xp_layer.height):
+                for j in range(self.xp_layer.width):
                     tile = self.xp_layer.tiles[self.xp_pos(i, j, self.xp_layer)]
                     fg = tile.fg_r, tile.fg_g, tile.fg_b
                     bg = tile.bg_r, tile.bg_g, tile.bg_b
-                    color_id = (fg, bg)
-                    if color_id not in colors_map:
-                        colors_map[color_id] = color_index
-                        p[color_index] = {"fg": fg, "bg": bg}
-                        # val = color_index
-                        color_index += 1
-                    else:
-                        pass
-                        # val = colors_map[color_id]
+                    # color_id = (fg, bg)
 
-                    char = cast(bytes, tile.ascii_code).decode(
-                        "cp437"
-                    )  # encode('cp437').decode("utf-8")
+                    char = cast(bytes, tile.ascii_code).decode("cp437")
 
                     char = char.replace(chr(0), "")
+                    if char not in p:
+                        p[char] = {"fg": fg, "bg": bg}
                     # console.print(char, end="")
-                    val = HEIGHT_TO_CHR_MAPPING.index(char) + 1
-                    row.append(val)
+                    # val = ord(char)
+                    row.append(ord(char))
                 self.height_map.append(row)
-
-            # self.palette16_dict["custom"] = p
-            # self.palette = "custom"
-            # self.build_palette()
+            global PALETTES_DICT
+            PALETTES_DICT["custom"] = p
+            # self.console.print(p.keys())
+            self.palette = "custom"
+            self.build_palette()
             # self.generate()
+
+        # read glyph layer
+        if len(self.image_layers) > 1:
+            self.glyph_layer = self.image_layers[1]
+            # self.map_size = max(self.xp_layer.width, self.xp_layer.height)
+            self.glyph_map = []
+            self.glyphs = []
+            for i in range(self.glyph_layer.width):
+                row: str = ""
+                for j in range(self.glyph_layer.height):
+                    tile = self.glyph_layer.tiles[self.xp_pos(i, j, self.glyph_layer)]
+                    # fg = tile.fg_r, tile.fg_g, tile.fg_b
+                    # bg = tile.bg_r, tile.bg_g, tile.bg_b
+
+                    char = cast(bytes, tile.ascii_code).decode("cp437")
+
+                    char = char.replace(chr(0), "")
+                    if char not in self.glyphs:
+                        self.glyphs.append(char)
+                    # console.print(char, end="")
+                    # val = ord(char)
+                    row += char
+                self.glyph_map.append(row)
+                # self.console.print(row)
+            # self.console.print(glyphs)
 
 
 if __name__ == "__main__":
@@ -565,5 +602,6 @@ if __name__ == "__main__":
     ds.save_to_png()
     ds.save_to_json()
     ds.print_height_map()
+    ds.console.print(ds.map_str)
 
     # bg_r, bg_g, bg_b = ds.palette_dict[symbol]["bg"]
